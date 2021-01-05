@@ -4,7 +4,7 @@
   "description": "memcached server workshop in node.js",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start:dev": "nodemon --inspect index.js",
     "start": "node index.js"
   },
@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/lopezisla/memcached-server#readme",
   "devDependencies": {
+    "jest": "^26.6.3",
     "nodemon": "^2.0.6"
   }
 }
