@@ -1,2 +1,3 @@
 const LINE_FEED = "\r\n";
-module.exports = { LINE_FEED };
+const BACKSPACE = "\b";
+module.exports = { LINE_FEED, BACKSPACE };
