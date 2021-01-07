@@ -1,4 +1,9 @@
-const { LINE_FEED, BACKSPACE, REGEX } = require("../config/constants.js");
+const {
+  LINE_FEED,
+  BACKSPACE,
+  REGEX,
+  A_16BIT_UNSIGNED_MAX_VALUE,
+} = require("../config/constants.js");
 const { ERROR, CLIENT_ERROR } = require("../config/serverMessages.js");
 const {
   ALL_COMMANDS,
@@ -66,14 +71,14 @@ class Parser {
 
   parseParams(fullCommand) {
     if (STORAGE_COMMANDS.includes(fullCommand[0])) {
-      const isValidKey = fullCommand[1].match(REGEX);
-      if (isValidKey[0] !== "") {
-        
+      const isValidKey = this.parseKey(fullCommand[1]);
+      const isValidFlag = this.parseFlag(fullCommand[2]);
+      if (isValidKey && isValidFlag) {
+        return true;
       } else {
         return false;
       }
     } else {
-
     }
 
     // let [_, key, flag, exptime, bytes, noreply] = fullCommand;
@@ -82,6 +87,20 @@ class Parser {
     // bytes = parseInt(bytes);
     // noreply = parseInt(noreply);
     // return [key, flag, exptime, bytes, noreply];
+  }
+
+  parseKey(key) {
+    const validKey = key.match(REGEX);
+    return validKey[0] !== "" ? true : false;
+  }
+
+  parseFlag(flag) {
+    const validFlag = parseFloat(flag)
+    return Number.isInteger(validFlag)
+      ? validFlag >= 0 && validFlag <= A_16BIT_UNSIGNED_MAX_VALUE
+        ? true
+        : false
+      : false;
   }
 }
 
