@@ -37,7 +37,8 @@ class Parser {
             if (isValidCommand) {
               if (RETRIEVAL_COMMANDS.includes(this.commandToRun[0])) {
                 const executor = new Executor();
-                const command = this.commandToRun;
+                const command = this.commandToRun.filter((c) => c !== undefined);
+                console.log(command);
                 this.commandToRun = [];
                 console.log(`check is this is empty: ${this.commandToRun}`);
                 console.log(`execute ${command}`);
@@ -52,9 +53,8 @@ class Parser {
           }
         } else {
           const valueChunkSplit = this.dataChunk.replace(LINE_FEED, "");
-
           const executor = new Executor();
-          const command = this.commandToRun;
+          const command = this.commandToRun.filter((c) => c !== undefined);
           this.commandToRun = [];
           console.log(`check is this is empty: ${this.commandToRun}`);
           this.dataChunk = "";

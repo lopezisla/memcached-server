@@ -12,10 +12,11 @@ const {
   PREPREND,
 } = require("../config/commands");
 
+const { LINE_FEED } = require("../config/constants.js");
+
 class Executor {
-  constructor(command, value) {
-    this.command = command;
-    this.value = value;
+  constructor() {
+    
   }
 
   execute(command, value) {
@@ -43,35 +44,37 @@ class Executor {
   }
 
   set(command, value) {
-    return `this a ${command} command with value: ${value}`;
+      console.log(command);
+    return `this a ${command} command with value: ${value}${LINE_FEED}`;
   }
 
   add(command, value) {
-    return `this a ${command} command with value: ${value}`;
+    return `this a ${command} command with value: ${value}${LINE_FEED}`;
   }
 
   replace(command, value) {
-    return `this a ${command} command with value: ${value}`;
+    return `this a ${command} command with value: ${value}${LINE_FEED}`;
   }
 
   append(command, value) {
-    return `this a ${command} command with value: ${value}`;
+    return `this a ${command} command with value: ${value}${LINE_FEED}`;
   }
 
   prepend(command, value) {
-    return `this a ${command} command with value: ${value}`;
+    return `this a ${command} command with value: ${value}${LINE_FEED}`;
   }
 
   cas(command, value) {
-    return `this a ${command} command with value: ${value}`;
+    return `this a ${command} command with value: ${value}${LINE_FEED}`;
   }
 
-  get(command, value) {
-    return `this a ${command} command`;
+  get(command) {
+    console.log(command);
+    return `this a ${command} command${LINE_FEED}`;
   }
 
-  gets(command, value) {
-    return `this a ${command} command`;
+  gets(command) {
+    return `this a ${command} command${LINE_FEED}`;
   }
 }
 module.exports = Executor;
