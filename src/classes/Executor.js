@@ -11,13 +11,11 @@ const {
   APPEND,
   PREPREND,
 } = require("../config/commands");
-
 const { LINE_FEED } = require("../config/constants.js");
+const { ERROR } = require("../config/serverMessages");
 
 class Executor {
-  constructor() {
-    
-  }
+  constructor() {}
 
   execute(command, value) {
     const commandName = command[0];
@@ -44,8 +42,10 @@ class Executor {
   }
 
   set(command, value) {
-      console.log(command);
-    return `this a ${command} command with value: ${value}${LINE_FEED}`;
+    const [, key, flags, exptime, bytes] = command;
+    if (value.length !== bytes) return ERROR;
+    if (exptime < 0) return STORED;
+    memcached.saveData({ key, flags, exptime, value });
   }
 
   add(command, value) {
@@ -77,4 +77,5 @@ class Executor {
     return `this a ${command} command${LINE_FEED}`;
   }
 }
+
 module.exports = Executor;

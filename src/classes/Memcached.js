@@ -7,5 +7,13 @@ class Memcached {
     Memcached.instance = this;
     return this;
   }
+
+  saveData({ key, flags, exptime, value }) {
+    console.log(key);
+    console.log(flags);
+    console.log(exptime);
+    console.log(value);
+    return "save";
+  }
 }
 module.exports = Memcached;

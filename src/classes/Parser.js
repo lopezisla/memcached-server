@@ -43,7 +43,6 @@ class Parser {
                 console.log(`check is this is empty: ${this.commandToRun}`);
                 console.log(`execute ${command}`);
                 return executor.execute(command);
-                
               }
             } else {
               return `${ERROR}${LINE_FEED}`;
@@ -61,17 +60,6 @@ class Parser {
           console.log(`check is this.data is empty: ${this.dataChunk}`);
           console.log(`execute ${command} with value ${valueChunkSplit}`);
           return executor.execute(command, valueChunkSplit);
-
-
-        //   console.log(`execute ${this.commandToRun}`);
-        //   console.log(`data entry: ${this.dataChunk}`);
-        //   console.log(`split data entry: ${valueChunkSplit}`);
-        //   this.commandToRun = [];
-        //   console.log(`check is this.command is empty: ${this.commandToRun}`);
-          
-        //   const result = `this var s going to be the result of exec: ${LINE_FEED}`;
-        //   console.log(result);
-        //   console.log(`length of this.command ${this.commandToRun.length}`);
         }
       }
     }
@@ -96,11 +84,7 @@ class Parser {
     const commandNameExists = this.parseCommand(fullCommand[0]);
     if (commandNameExists) {
       const areValidParams = this.parseParams(fullCommand);
-      if (areValidParams) {
-        return true;
-      } else {
-        return false;
-      }
+      return areValidParams ? true : false;
     } else {
       return false;
     }
@@ -113,22 +97,22 @@ class Parser {
   parseParams(fullCommand) {
     if (STORAGE_COMMANDS.includes(fullCommand[0])) {
       const isValidKey = this.parseKey(fullCommand[1]);
-      const isValidFlag = this.parseFlag(fullCommand[2]);
+      const areValidFlags = this.parseFlags(fullCommand[2]);
       const isValidExptime = this.parseExptime(fullCommand[3]);
-      const isValidBytes = this.parseBytes(fullCommand[4]);
+      const areValidBytes = this.parseBytes(fullCommand[4]);
       if (
         isValidKey &&
-        isValidFlag[0] &&
+        areValidFlags[0] &&
         isValidExptime[0] &&
-        isValidBytes[0]
+        areValidBytes[0]
       ) {
         if (fullCommand[0] === CAS) {
           this.setCommand(
             fullCommand[0],
             isValidKey,
-            isValidFlag[1],
+            areValidFlags[1],
             isValidExptime[1],
-            isValidBytes[1],
+            areValidBytes[1],
             fullCommand[5]
           );
           return true;
@@ -136,9 +120,9 @@ class Parser {
           this.setCommand(
             fullCommand[0],
             isValidKey,
-            isValidFlag[1],
+            areValidFlags[1],
             isValidExptime[1],
-            isValidBytes[1]
+            areValidBytes[1]
           );
           return true;
         }
@@ -156,11 +140,11 @@ class Parser {
     return validKey[0] !== "" ? validKey[0] : false;
   }
 
-  parseFlag(flag) {
-    const validFlag = parseInt(flag);
-    return Number.isInteger(validFlag)
-      ? validFlag >= 0 && validFlag <= A_16BIT_UNSIGNED_MAX_VALUE
-        ? [true, validFlag]
+  parseFlags(flags) {
+    const validFlags = parseInt(flags);
+    return Number.isInteger(validFlags)
+      ? validFlags >= 0 && validFlags <= A_16BIT_UNSIGNED_MAX_VALUE
+        ? [true, validFlags]
         : false
       : false;
   }
@@ -179,11 +163,11 @@ class Parser {
       : false;
   }
 
-  setCommand(command, key, flag, exptime, bytes, casUnique) {
+  setCommand(command, key, flags, exptime, bytes, casUnique) {
     return (this.commandToRun = [
       command,
       key,
-      flag,
+      flags,
       exptime,
       bytes,
       casUnique,
