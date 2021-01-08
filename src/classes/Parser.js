@@ -34,11 +34,9 @@ class Parser {
             console.log(this.commandToRun);
             if (isValidCommand) {
               if (RETRIEVAL_COMMANDS.includes(this.commandToRun[0])) {
-                console.log(this.commandToRun);
-                console.log(" get ");
-                console.log("execute get gets" + LINE_FEED);
+                console.log(`execute ${this.commandToRun}`);
                 this.commandToRun = [];
-                console.log(this.commandToRun);
+                console.log(`check is this is empty: ${this.commandToRun}`);
               }
             } else {
               return `${ERROR}${LINE_FEED}`;
@@ -50,19 +48,17 @@ class Parser {
           console.log("entre a value");
           const valueChunkSplit = this.dataChunk.replace(LINE_FEED, "");
 
-          console.log(this.commandToRun);
-          console.log(this.dataChunk);
-          console.log(valueChunkSplit);
-          console.log(" storage ");
-          console.log("execute storage" + LINE_FEED);
+          console.log(`execute ${this.commandToRun}`);
+          console.log(`data entry: ${this.dataChunk}`);
+          console.log(`split data entry: ${valueChunkSplit}`);
           this.commandToRun = [];
+          console.log(`check is this.command is empty: ${this.commandToRun}`);
           this.dataChunk = "";
-          console.log(this.commandToRun);
-          console.log(this.dataChunk);
-
-          const result = "execute(comando, valueChunkSplit)" + LINE_FEED;
+          console.log(`check is this.data is empty: ${this.dataChunk}`);
+          
+          const result = `this var s going to be the result of exec: ${LINE_FEED}`;
           console.log(result);
-          console.log(this.commandToRun.length);
+          console.log(`length of this.command ${this.commandToRun.length}`);
         }
       }
     }
@@ -137,12 +133,8 @@ class Parser {
         return false;
       }
     } else {
-        this.setCommand(
-            fullCommand[0],
-            fullCommand[1],
-            fullCommand[2],
-          );
-          return true;
+      this.setCommand(fullCommand[0], fullCommand[1], fullCommand[2]);
+      return true;
     }
   }
 
