@@ -1,3 +1,5 @@
+const Executor = require('../classes/Executor');
+
 const {
   LINE_FEED,
   BACKSPACE,
@@ -34,9 +36,13 @@ class Parser {
             console.log(this.commandToRun);
             if (isValidCommand) {
               if (RETRIEVAL_COMMANDS.includes(this.commandToRun[0])) {
-                console.log(`execute ${this.commandToRun}`);
+                const executor = new Executor();
+                const command = this.commandToRun;
                 this.commandToRun = [];
                 console.log(`check is this is empty: ${this.commandToRun}`);
+                console.log(`execute ${command}`);
+                return executor.execute(command);
+                
               }
             } else {
               return `${ERROR}${LINE_FEED}`;
@@ -45,20 +51,27 @@ class Parser {
             return `${CLIENT_ERROR} missing parameters${LINE_FEED}`;
           }
         } else {
-          console.log("entre a value");
           const valueChunkSplit = this.dataChunk.replace(LINE_FEED, "");
 
-          console.log(`execute ${this.commandToRun}`);
-          console.log(`data entry: ${this.dataChunk}`);
-          console.log(`split data entry: ${valueChunkSplit}`);
+          const executor = new Executor();
+          const command = this.commandToRun;
           this.commandToRun = [];
-          console.log(`check is this.command is empty: ${this.commandToRun}`);
+          console.log(`check is this is empty: ${this.commandToRun}`);
           this.dataChunk = "";
           console.log(`check is this.data is empty: ${this.dataChunk}`);
+          console.log(`execute ${command} with value ${valueChunkSplit}`);
+          return executor.execute(command, valueChunkSplit);
+
+
+        //   console.log(`execute ${this.commandToRun}`);
+        //   console.log(`data entry: ${this.dataChunk}`);
+        //   console.log(`split data entry: ${valueChunkSplit}`);
+        //   this.commandToRun = [];
+        //   console.log(`check is this.command is empty: ${this.commandToRun}`);
           
-          const result = `this var s going to be the result of exec: ${LINE_FEED}`;
-          console.log(result);
-          console.log(`length of this.command ${this.commandToRun.length}`);
+        //   const result = `this var s going to be the result of exec: ${LINE_FEED}`;
+        //   console.log(result);
+        //   console.log(`length of this.command ${this.commandToRun.length}`);
         }
       }
     }
