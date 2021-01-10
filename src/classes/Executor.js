@@ -11,8 +11,7 @@ const {
   APPEND,
   PREPREND,
 } = require("../config/commands");
-const { LINE_FEED } = require("../config/constants.js");
-const { ERROR } = require("../config/serverMessages");
+const { ERROR, STORED } = require("../config/serverMessages");
 
 class Executor {
   constructor() {}
@@ -42,39 +41,38 @@ class Executor {
   }
 
   set(command, value) {
-    const [, key, flags, exptime, bytes] = command;
-    if (value.length !== bytes) return ERROR;
+    const [, key, flags, exptime] = command;
     if (exptime < 0) return STORED;
-    memcached.saveData({ key, flags, exptime, value });
+    return memcached.saveData(key, flags, exptime, value);
   }
 
   add(command, value) {
-    return `this a ${command} command with value: ${value}${LINE_FEED}`;
+    return `this a ${command} command with value: ${value}`;
   }
 
   replace(command, value) {
-    return `this a ${command} command with value: ${value}${LINE_FEED}`;
+    return `this a ${command} command with value: ${value}`;
   }
 
   append(command, value) {
-    return `this a ${command} command with value: ${value}${LINE_FEED}`;
+    return `this a ${command} command with value: ${value}`;
   }
 
   prepend(command, value) {
-    return `this a ${command} command with value: ${value}${LINE_FEED}`;
+    return `this a ${command} command with value: ${value}`;
   }
 
   cas(command, value) {
-    return `this a ${command} command with value: ${value}${LINE_FEED}`;
+    return `this a ${command} command with value: ${value}`;
   }
 
   get(command) {
     console.log(command);
-    return `this a ${command} command${LINE_FEED}`;
+    return `this a ${command} command`;
   }
 
   gets(command) {
-    return `this a ${command} command${LINE_FEED}`;
+    return `this a ${command} command`;
   }
 }
 

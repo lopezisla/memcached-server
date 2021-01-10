@@ -9,15 +9,13 @@ const socketConnection = (socket) => {
   socket.write(
     `Welcome ${socket.remoteAddress}:${socket.remotePort} to Memcached Server${LINE_FEED}`
   );
-  //c.on("data", (chunk) => c.write(chunk));
   socket.on("data", (data) => {
     const response = parser.readStream(data);
-    if (response) socket.write(response);
+    if (response) socket.write(`${response}${LINE_FEED}`);
   });
   socket.on("end", () =>
     console.log(`${socket.remoteAddress}:${socket.remotePort} disconnected`)
-  );
-  //c.pipe(c);
+  ); 
 };
 
 module.exports = { PORT, socketConnection };

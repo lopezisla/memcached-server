@@ -1,10 +1,10 @@
-const Executor = require('../classes/Executor');
-
+const Executor = require("../classes/Executor");
 const {
   LINE_FEED,
   BACKSPACE,
   REGEX,
   A_16BIT_UNSIGNED_MAX_VALUE,
+  SECONDS_MAX_VALUE,
 } = require("../config/constants.js");
 const { ERROR, CLIENT_ERROR } = require("../config/serverMessages.js");
 const {
@@ -26,38 +26,32 @@ class Parser {
       if (this.wasBackspacePressed()) {
         this.dataChunk = "";
         this.commandToRun = [];
-        return `${CLIENT_ERROR} control characters are not allowed${LINE_FEED}`;
+        return `${CLIENT_ERROR} control characters are not allowed`;
       } else {
+        //check if there was a previous data entry
         if (!this.commandToRun.length) {
           const commandChunkSplit = this.splitCommandChunk();
           this.dataChunk = "";
-          if (commandChunkSplit.length > 1) {
-            const isValidCommand = this.parseFullCommand(commandChunkSplit);
-            console.log(this.commandToRun);
-            if (isValidCommand) {
-              if (RETRIEVAL_COMMANDS.includes(this.commandToRun[0])) {
-                const executor = new Executor();
-                const command = this.commandToRun.filter((c) => c !== undefined);
-                console.log(command);
-                this.commandToRun = [];
-                console.log(`check is this is empty: ${this.commandToRun}`);
-                console.log(`execute ${command}`);
-                return executor.execute(command);
-              }
-            } else {
-              return `${ERROR}${LINE_FEED}`;
-            }
-          } else {
-            return `${CLIENT_ERROR} missing parameters${LINE_FEED}`;
+          if (!commandChunkSplit.length > 1)
+            return `${CLIENT_ERROR} missing parameters`;
+          const isValidCommand = this.parseFullCommand(commandChunkSplit);
+          if (!isValidCommand) return ERROR;
+          if (RETRIEVAL_COMMANDS.includes(this.commandToRun[0])) {
+            const executor = new Executor();
+            const command = this.commandToRun.filter((c) => c !== undefined);
+            this.commandToRun = [];
+            return executor.execute(command);
           }
-        } else {
+        } else { 
           const valueChunkSplit = this.dataChunk.replace(LINE_FEED, "");
-          const executor = new Executor();
+          this.dataChunk = "";
+          console.log(`check is this.data is empty: ${this.dataChunk}`);
           const command = this.commandToRun.filter((c) => c !== undefined);
           this.commandToRun = [];
           console.log(`check is this is empty: ${this.commandToRun}`);
-          this.dataChunk = "";
-          console.log(`check is this.data is empty: ${this.dataChunk}`);
+          //checks if value length is equal to command parameter bytes
+          if (valueChunkSplit.length !== command[4]) return ERROR;
+          const executor = new Executor();
           console.log(`execute ${command} with value ${valueChunkSplit}`);
           return executor.execute(command, valueChunkSplit);
         }
@@ -151,7 +145,11 @@ class Parser {
 
   parseExptime(exptime) {
     const validExptime = parseInt(exptime);
-    return Number.isInteger(validExptime) ? [true, validExptime] : false;
+    return Number.isInteger(validExptime)
+      ? validExptime < SECONDS_MAX_VALUE 
+        ? [true, validExptime]
+        : false
+      : false;
   }
 
   parseBytes(bytes) {
