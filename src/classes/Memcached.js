@@ -14,17 +14,17 @@ class Memcached {
   }
 
   saveData(key, flags, exptime, value) {
-    let data = [flags, value, this.getCas()];
+    let data = [key, flags, this.getCas(), value];
     console.log(data);
     this.cache[key] = data;
     console.log(this.cache[key]);
     console.log(this.cache);
     if (exptime > 0) {
-        setTimeout(() => {
-          this.deleteData(key);
-          console.log(this.cache);
-        }, exptime * SECOND);
-      }
+      setTimeout(() => {
+        this.deleteData(key);
+        console.log(this.cache);
+      }, exptime * SECOND);
+    }
     return STORED;
   }
 
@@ -34,8 +34,17 @@ class Memcached {
     return casUnique;
   }
 
-  deleteData(key){
+  deleteData(key) {
     delete this.cache[key];
+  }
+
+  readData(key, cas = false) {
+    const dataArray = this.cache[key];
+    if (!dataArray) return false;
+    const valueDataArray = dataArray.pop();
+    return cas
+      ? `VALUE ${dataArray}${LINE_FEED}${valueDataArray}`
+      : `VALUE ${dataArray.pop()}${LINE_FEED}${valueDataArray}`;
   }
 }
 module.exports = Memcached;

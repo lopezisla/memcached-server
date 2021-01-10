@@ -67,12 +67,28 @@ class Executor {
   }
 
   get(command) {
-    console.log(command);
-    return `this a ${command} command`;
+    command.shift();
+    let message = "";
+    command.forEach(key => {
+        result = memcached.readData(key);
+        if (result){
+            message += `${result}${LINE_FEED}`;
+        }
+    })
+    return message;
   }
 
   gets(command) {
-    return `this a ${command} command`;
+    command.shift();
+    cas = command.pop();
+    let message = "";
+    command.forEach(key => {
+        result = memcached.readData(key, cas);
+        if (result){
+            message += `${result}${LINE_FEED}`;
+        }
+    })
+    return message;
   }
 }
 

@@ -29,6 +29,8 @@ class Parser {
         return `${CLIENT_ERROR} control characters are not allowed`;
       } else {
         //check if there was a previous data entry
+        console.log("-");
+        console.log(this.commandToRun.length);
         if (!this.commandToRun.length) {
           const commandChunkSplit = this.splitCommandChunk();
           this.dataChunk = "";
@@ -124,7 +126,7 @@ class Parser {
         return false;
       }
     } else {
-      this.setCommand(fullCommand[0], fullCommand[1], fullCommand[2]);
+      this.commandToRun = fullCommand;
       return true;
     }
   }
