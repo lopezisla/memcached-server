@@ -13,7 +13,7 @@ class Memcached {
     return this;
   }
 
-  saveData(key, flags, exptime, bytes, value) {
+  createData(key, flags, exptime, bytes, value) {
     let data = [key, flags, bytes, this.getCas(), value];
     console.log(data);
     this.cache[key] = data;
@@ -27,6 +27,21 @@ class Memcached {
     }
     return STORED;
   }
+  
+  readData(key, cas) {
+    if (!this.cache[key]) return false;
+    const dataArray = Array.from(this.cache[key]);
+    const valueDataArray = dataArray.pop();
+    if (!cas) {
+      dataArray.pop();
+    }
+    const message = dataArray.join(" ");
+    return `VALUE ${message}${LINE_FEED}${valueDataArray}`;
+  }
+
+  deleteData(key) {
+    delete this.cache[key];
+  }
 
   getCas() {
     const casUnique = this.casUnique;
@@ -34,22 +49,9 @@ class Memcached {
     return casUnique;
   }
 
-  deleteData(key) {
-    delete this.cache[key];
+  keyExists(key) {
+    return Boolean(this.cache[key]);
   }
 
-  readData(key, cas) {
-      if (!this.cache[key]) return false;
-    const dataArray = Array.from(this.cache[key]);
-    console.log(`dataArray: ${dataArray}`);
-    const valueDataArray = dataArray.pop();
-    console.log(`valueDataArray ${valueDataArray}`);
-    console.log(`dataArray: ${dataArray}`);
-    if (!cas){
-        dataArray.pop()
-    } 
-    const message = dataArray.join(" ")     
-    return `VALUE ${message}${LINE_FEED}${valueDataArray}`
-  }
 }
 module.exports = Memcached;

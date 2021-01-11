@@ -27,14 +27,14 @@ class Parser {
       if (this.wasBackspacePressed()) {
         this.dataChunk = "";
         this.commandToRun = [];
-        return `${CLIENT_ERROR} control characters are not allowed`;
+        return `${CLIENT_ERROR} control characters are not allowed.`;
       } else {
         //check if there was a previous data entry
         if (!this.commandToRun.length) {
           const commandChunkSplit = this.splitCommandChunk();
           this.dataChunk = "";
           if (commandChunkSplit.length <= 1)
-            return `${CLIENT_ERROR} wrong command`;
+            return `${CLIENT_ERROR} wrong command.`;
           const isValidCommand = this.parseFullCommand(commandChunkSplit);
           console.log("valid command: ");
           console.log(isValidCommand);
@@ -54,7 +54,7 @@ class Parser {
           this.commandToRun = [];
           const commandBytes = parseInt(commandToRun[4])
           //checks if value length is equal to command parameter bytes
-          if (valueChunkSplit.length !== commandBytes) return "lencth";
+          if (valueChunkSplit.length !== commandBytes) return ERROR;
           const executor = new Executor();
           const result = executor.execute(commandToRun, valueChunkSplit);
           const checkNoReply = commandToRun.pop();

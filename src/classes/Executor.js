@@ -11,7 +11,7 @@ const {
   APPEND,
   PREPREND,
 } = require("../config/commands");
-const { STORED, END } = require("../config/serverMessages");
+const { STORED, END, NOT_STORED } = require("../config/serverMessages");
 
 class Executor {
   constructor() {}
@@ -43,15 +43,19 @@ class Executor {
   set(command, value) {
     const [, key, flags, exptime, bytes] = command;
     if (exptime < 0) return STORED;
-    return memcached.saveData(key, flags, exptime, bytes, value);
+    return memcached.createData(key, flags, exptime, bytes, value);
   }
 
   add(command, value) {
-    return `this a ${command} command with value: ${value}`;
+    const key = command[1];
+    if (memcached.keyExists(key)) return NOT_STORED;
+    return this.set(command, value);
   }
 
   replace(command, value) {
-    return `this a ${command} command with value: ${value}`;
+    const key = command[1];
+    if (!memcached.keyExists(key)) return NOT_STORED;
+    return this.set(command, value);
   }
 
   append(command, value) {
@@ -67,28 +71,20 @@ class Executor {
   }
 
   get(command, cas = false) {
-    console.log("get");
-    console.log(cas);
-    console.log(command);
     command.shift();
-    console.log(command);
     let message = "";
-    command.forEach(key => {
-        console.log(cas);
-        const result = memcached.readData(key, cas);
-        if (result){
-            message += `${result}${LINE_FEED}`;
-        }
-    })
+    command.forEach((key) => {
+      const result = memcached.readData(key, cas);
+      if (result) {
+        message += `${result}${LINE_FEED}`;
+      }
+    });
     return `${message}${END}`;
   }
 
   gets(command) {
-    console.log("gets");
-    console.log(command);
     const cas = true;
-    console.log(command);
-    return this.get(command, cas)
+    return this.get(command, cas);
   }
 }
 
