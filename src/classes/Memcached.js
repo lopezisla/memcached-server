@@ -1,5 +1,5 @@
 const { STORED } = require("../config/serverMessages");
-const { SECOND } = require("../config/constants");
+const { LINE_FEED, SECOND } = require("../config/constants");
 
 class Memcached {
   constructor() {
@@ -13,8 +13,8 @@ class Memcached {
     return this;
   }
 
-  saveData(key, flags, exptime, value) {
-    let data = [key, flags, this.getCas(), value];
+  saveData(key, flags, exptime, bytes, value) {
+    let data = [key, flags, bytes, this.getCas(), value];
     console.log(data);
     this.cache[key] = data;
     console.log(this.cache[key]);
@@ -38,13 +38,18 @@ class Memcached {
     delete this.cache[key];
   }
 
-  readData(key, cas = false) {
-    const dataArray = this.cache[key];
-    if (!dataArray) return false;
+  readData(key, cas) {
+      if (!this.cache[key]) return false;
+    const dataArray = Array.from(this.cache[key]);
+    console.log(`dataArray: ${dataArray}`);
     const valueDataArray = dataArray.pop();
-    return cas
-      ? `VALUE ${dataArray}${LINE_FEED}${valueDataArray}`
-      : `VALUE ${dataArray.pop()}${LINE_FEED}${valueDataArray}`;
+    console.log(`valueDataArray ${valueDataArray}`);
+    console.log(`dataArray: ${dataArray}`);
+    if (!cas){
+        dataArray.pop()
+    } 
+    const message = dataArray.join(" ")     
+    return `VALUE ${message}${LINE_FEED}${valueDataArray}`
   }
 }
 module.exports = Memcached;

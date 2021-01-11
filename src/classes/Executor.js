@@ -1,6 +1,6 @@
 const Memcached = require("../classes/Memcached");
 const memcached = new Memcached();
-
+const { LINE_FEED } = require("../config/constants");
 const {
   CAS,
   GET,
@@ -11,7 +11,7 @@ const {
   APPEND,
   PREPREND,
 } = require("../config/commands");
-const { ERROR, STORED } = require("../config/serverMessages");
+const { STORED, END } = require("../config/serverMessages");
 
 class Executor {
   constructor() {}
@@ -41,9 +41,9 @@ class Executor {
   }
 
   set(command, value) {
-    const [, key, flags, exptime] = command;
+    const [, key, flags, exptime, bytes] = command;
     if (exptime < 0) return STORED;
-    return memcached.saveData(key, flags, exptime, value);
+    return memcached.saveData(key, flags, exptime, bytes, value);
   }
 
   add(command, value) {
@@ -66,29 +66,29 @@ class Executor {
     return `this a ${command} command with value: ${value}`;
   }
 
-  get(command) {
+  get(command, cas = false) {
+    console.log("get");
+    console.log(cas);
+    console.log(command);
     command.shift();
+    console.log(command);
     let message = "";
     command.forEach(key => {
-        result = memcached.readData(key);
+        console.log(cas);
+        const result = memcached.readData(key, cas);
         if (result){
             message += `${result}${LINE_FEED}`;
         }
     })
-    return message;
+    return `${message}${END}`;
   }
 
   gets(command) {
-    command.shift();
-    cas = command.pop();
-    let message = "";
-    command.forEach(key => {
-        result = memcached.readData(key, cas);
-        if (result){
-            message += `${result}${LINE_FEED}`;
-        }
-    })
-    return message;
+    console.log("gets");
+    console.log(command);
+    const cas = true;
+    console.log(command);
+    return this.get(command, cas)
   }
 }
 
