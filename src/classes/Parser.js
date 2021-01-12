@@ -36,8 +36,6 @@ class Parser {
           if (commandChunkSplit.length <= 1)
             return `${CLIENT_ERROR} wrong command.`;
           const isValidCommand = this.parseFullCommand(commandChunkSplit);
-          console.log("valid command: ");
-          console.log(isValidCommand);
           if (!isValidCommand) return ERROR;
           if (RETRIEVAL_COMMANDS.includes(this.commandToRun[0])) {
             const commandToRun = this.commandToRun.filter(
@@ -94,8 +92,6 @@ class Parser {
   }
 
   parseParams(fullCommand) {
-      const a = fullCommand
-      console.log(a);
     if (STORAGE_COMMANDS.includes(fullCommand[0])) {
       this.setFullCommand(fullCommand[0]);
       const isValidKey = this.parseKey(fullCommand[1]);
@@ -167,12 +163,9 @@ class Parser {
   }
 
   parseBytes(bytes) {
-      console.log(bytes);
       const validBytes = parseInt(bytes);
-      console.log(validBytes);
     if (Number.isInteger(validBytes)) {
       if (validBytes >= 0) {
-          console.log(validBytes);
         this.setFullCommand(validBytes);
         return true;
       } else {

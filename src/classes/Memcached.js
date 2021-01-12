@@ -1,5 +1,6 @@
 const { STORED } = require("../config/serverMessages");
 const { LINE_FEED, SECOND } = require("../config/constants");
+const { APPEND } = require("../config/commands");
 
 class Memcached {
   constructor() {
@@ -15,9 +16,7 @@ class Memcached {
 
   createData(key, flags, exptime, bytes, value) {
     let data = [key, flags, bytes, this.getCas(), value];
-    console.log(data);
     this.cache[key] = data;
-    console.log(this.cache[key]);
     console.log(this.cache);
     if (exptime > 0) {
       setTimeout(() => {
@@ -27,9 +26,9 @@ class Memcached {
     }
     return STORED;
   }
-  
+
   readData(key, cas) {
-    if (!this.cache[key]) return false;
+    if (!this.keyExists(key)) return false;
     const dataArray = Array.from(this.cache[key]);
     const valueDataArray = dataArray.pop();
     if (!cas) {
@@ -37,6 +36,17 @@ class Memcached {
     }
     const message = dataArray.join(" ");
     return `VALUE ${message}${LINE_FEED}${valueDataArray}`;
+  }
+
+  updateData(commandName, key, bytes, value) {
+    this.cache[key][2] = parseInt(this.cache[key][2])+parseInt(bytes);
+    this.cache[key][3] = this.getCas();
+    if (commandName === APPEND) {
+      this.cache[key][4] = `${this.cache[key][4]}${value}`;
+    } else {
+      this.cache[key][4] = `${value}${this.cache[key][4]}`;
+    }
+    return STORED;
   }
 
   deleteData(key) {
@@ -52,6 +62,5 @@ class Memcached {
   keyExists(key) {
     return Boolean(this.cache[key]);
   }
-
 }
 module.exports = Memcached;

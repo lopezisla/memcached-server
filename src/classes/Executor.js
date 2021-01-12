@@ -59,11 +59,13 @@ class Executor {
   }
 
   append(command, value) {
-    return `this a ${command} command with value: ${value}`;
+    const [commandName, key, , , bytes] = command;
+    if (!memcached.keyExists(key)) return NOT_STORED;
+    return memcached.updateData(commandName, key, bytes, value);
   }
 
   prepend(command, value) {
-    return `this a ${command} command with value: ${value}`;
+    return this.append(command, value);
   }
 
   cas(command, value) {
