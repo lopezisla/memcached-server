@@ -15,7 +15,7 @@ class Memcached {
   }
 
   createData(key, flags, exptime, bytes, value) {
-    let data = [key, flags, bytes, this.getCas(), value];
+    let data = [key, flags, bytes, this.setCas(), value];
     this.cache[key] = data;
     console.log(this.cache);
     if (exptime > 0) {
@@ -39,8 +39,8 @@ class Memcached {
   }
 
   updateData(commandName, key, bytes, value) {
-    this.cache[key][2] = parseInt(this.cache[key][2])+parseInt(bytes);
-    this.cache[key][3] = this.getCas();
+    this.cache[key][2] = parseInt(this.cache[key][2]) + parseInt(bytes);
+    this.cache[key][3] = this.setCas();
     if (commandName === APPEND) {
       this.cache[key][4] = `${this.cache[key][4]}${value}`;
     } else {
@@ -53,10 +53,14 @@ class Memcached {
     delete this.cache[key];
   }
 
-  getCas() {
+  setCas() {
     const casUnique = this.casUnique;
     this.casUnique++;
     return casUnique;
+  }
+
+  getCas(key) {
+    return this.cache[key][3];
   }
 
   keyExists(key) {

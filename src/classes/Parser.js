@@ -29,7 +29,7 @@ class Parser {
         this.commandToRun = [];
         return `${CLIENT_ERROR} control characters are not allowed.`;
       } else {
-        //check if there was a previous data entry
+        //check if there was a previous data entry (a command) which means that this data entry is a datablock
         if (!this.commandToRun.length) {
           const commandChunkSplit = this.splitCommandChunk();
           this.dataChunk = "";
@@ -50,7 +50,7 @@ class Parser {
           this.dataChunk = "";
           const commandToRun = this.cleanCommand();
           this.commandToRun = [];
-          const commandBytes = parseInt(commandToRun[4])
+          const commandBytes = parseInt(commandToRun[4]);
           //checks if value length is equal to command parameter bytes
           if (valueChunkSplit.length !== commandBytes) return ERROR;
           const executor = new Executor();
@@ -125,7 +125,6 @@ class Parser {
     } else {
       return false;
     }
-    //return validKey[0] !== "" ? validKey[0] : false;
   }
 
   parseFlags(flags) {
@@ -140,12 +139,6 @@ class Parser {
     } else {
       return false;
     }
-
-    // return Number.isInteger(validFlags)
-    //   ? validFlags >= 0 && validFlags <= A_16BIT_UNSIGNED_MAX_VALUE
-    //     ? [true, validFlags]
-    //     : false
-    //   : false;
   }
 
   parseExptime(exptime) {
@@ -163,7 +156,7 @@ class Parser {
   }
 
   parseBytes(bytes) {
-      const validBytes = parseInt(bytes);
+    const validBytes = parseInt(bytes);
     if (Number.isInteger(validBytes)) {
       if (validBytes >= 0) {
         this.setFullCommand(validBytes);
@@ -174,11 +167,6 @@ class Parser {
     } else {
       return false;
     }
-    // return Number.isInteger(validBytes)
-    //   ? validBytes >= 0
-    //     ? [true, validBytes]
-    //     : false
-    //   : false;
   }
 
   setFullCommand(param) {
@@ -187,13 +175,11 @@ class Parser {
 
   checkNoReply(params) {
     return params.includes("noreply");
-    //return true;
   }
 
   cleanCommand() {
     return this.commandToRun.filter((c) => c !== undefined);
   }
-
 }
 
 module.exports = Parser;

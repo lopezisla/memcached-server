@@ -11,7 +11,13 @@ const {
   APPEND,
   PREPREND,
 } = require("../config/commands");
-const { STORED, END, NOT_STORED } = require("../config/serverMessages");
+const {
+  STORED,
+  END,
+  NOT_STORED,
+  EXISTS,
+  NOT_FOUND,
+} = require("../config/serverMessages");
 
 class Executor {
   constructor() {}
@@ -69,7 +75,12 @@ class Executor {
   }
 
   cas(command, value) {
-    return `this a ${command} command with value: ${value}`;
+    const key = command[1];
+    const requestedCas = parseInt(command[5]);
+    if (!memcached.keyExists(key)) return NOT_FOUND;
+    const currentCas = memcached.getCas(key);
+    if (currentCas !== requestedCas) return EXISTS;
+    return this.set(command, value);
   }
 
   get(command, cas = false) {
