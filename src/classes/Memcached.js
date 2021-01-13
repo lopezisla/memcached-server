@@ -17,7 +17,6 @@ class Memcached {
     if (exptime > 0) exptime = this.setTimer(key, exptime);
     const data = [key, flags, this.setCas(), bytes, exptime, value];
     this.cache[key] = data;
-    console.log(this.cache);
     return STORED;
   }
 
@@ -40,7 +39,6 @@ class Memcached {
     } else {
       this.cache[key][5] = `${value}${this.cache[key][5]}`;
     }
-    console.log(this.cache);
     return STORED;
   }
 

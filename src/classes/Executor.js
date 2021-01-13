@@ -49,7 +49,7 @@ class Executor {
   set(command, value, replaceOrCas = false) {
     const [, key, flags, exptime, bytes] = command;
     if (!replaceOrCas) {
-      if (memcached.keyExists(key)) return "set";
+      if (memcached.keyExists(key)) return EXISTS;
     }
     if (exptime < 0) return STORED;
     return memcached.createData(key, flags, exptime, bytes, value);
@@ -84,7 +84,7 @@ class Executor {
     if (!memcached.keyExists(key)) return NOT_FOUND;
     const requestedCas = Number(command[5]);
     const currentCas = memcached.getCas(key);
-    if (currentCas !== requestedCas) return "cas";
+    if (currentCas !== requestedCas) return EXISTS;
     const timerId = memcached.getTimer(key);
     if (timerId) clearTimeout(timerId);
     return this.set(command, value, true);

@@ -1,4 +1,4 @@
-const ERROR = 'ERROR'; //means the client sent a nonexistent command name.
+const ERROR = 'ERROR'; 
 const CLIENT_ERROR = 'CLIENT_ERROR';
 const SERVER_ERROR = 'SERVER_ERROR';
 const STORED = 'STORED';

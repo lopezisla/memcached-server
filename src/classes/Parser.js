@@ -29,7 +29,7 @@ class Parser {
         this.commandToRun = [];
         return `${CLIENT_ERROR} control characters are not allowed.`;
       } else {
-        //check if there was a previous data entry (a command) which means that this data entry is a datablock
+        //it checks if there was a previous data entry for a storage command, if there was not, it will execute the if statement, if there was it means that the current data entry is a datablock and it will execute the else statement
         if (!this.commandToRun.length) {
           const commandChunkSplit = this.splitCommandChunk();
           this.dataChunk = "";
@@ -43,6 +43,7 @@ class Parser {
             const commandToRun = this.cleanCommand();
             const executor = new Executor();
             this.commandToRun = [];
+            this.noReply = "";
             return executor.execute(commandToRun);
           }
         } else {
@@ -51,7 +52,6 @@ class Parser {
           const commandToRun = this.cleanCommand();
           this.commandToRun = [];
           const commandBytes = Number(commandToRun[4]);
-          //checks if value length is equal to command parameter bytes
           if (valueChunkSplit.length !== commandBytes) return ERROR;
           const executor = new Executor();
           const result = executor.execute(commandToRun, valueChunkSplit);
