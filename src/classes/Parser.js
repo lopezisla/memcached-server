@@ -12,13 +12,13 @@ const {
   STORAGE_COMMANDS,
   CAS,
   RETRIEVAL_COMMANDS,
-  GETS,
 } = require("../config/commands.js");
 
 class Parser {
   constructor() {
     this.dataChunk = "";
     this.commandToRun = [];
+    this.noReply = "";
   }
 
   readStream(chunk) {
@@ -35,12 +35,12 @@ class Parser {
           this.dataChunk = "";
           if (commandChunkSplit.length <= 1)
             return `${CLIENT_ERROR} wrong command.`;
+          if (commandChunkSplit.includes("noreply"))
+            this.noReply = commandChunkSplit.pop();
           const isValidCommand = this.parseFullCommand(commandChunkSplit);
           if (!isValidCommand) return ERROR;
           if (RETRIEVAL_COMMANDS.includes(this.commandToRun[0])) {
-            const commandToRun = this.commandToRun.filter(
-              (c) => c !== undefined
-            );
+            const commandToRun = this.cleanCommand();
             const executor = new Executor();
             this.commandToRun = [];
             return executor.execute(commandToRun);
@@ -50,13 +50,14 @@ class Parser {
           this.dataChunk = "";
           const commandToRun = this.cleanCommand();
           this.commandToRun = [];
-          const commandBytes = parseInt(commandToRun[4]);
+          const commandBytes = Number(commandToRun[4]);
           //checks if value length is equal to command parameter bytes
           if (valueChunkSplit.length !== commandBytes) return ERROR;
           const executor = new Executor();
           const result = executor.execute(commandToRun, valueChunkSplit);
-          const checkNoReply = commandToRun.pop();
-          return checkNoReply === "noreply" ? "" : result;
+          const noReply = this.noReply;
+          this.noReply = "";
+          return noReply === "noreply" ? "" : result;
         }
       }
     }
@@ -80,8 +81,13 @@ class Parser {
   parseFullCommand(fullCommand) {
     const commandNameExists = this.parseCommand(fullCommand[0]);
     if (commandNameExists) {
-      const areValidParams = this.parseParams(fullCommand);
-      return areValidParams ? true : false;
+      const isValidLength = this.checkFullCommandLength(fullCommand);
+      if (isValidLength) {
+        const areValidParams = this.parseParams(fullCommand);
+        return areValidParams ? true : false;
+      } else {
+        return false;
+      }
     } else {
       return false;
     }
@@ -89,6 +95,16 @@ class Parser {
 
   parseCommand(commandName) {
     return ALL_COMMANDS.includes(commandName) ? true : false;
+  }
+
+  checkFullCommandLength(fullCommand) {
+    if (fullCommand[0] === CAS) {
+      return fullCommand.length === 6 ? true : false;
+    } else if (STORAGE_COMMANDS.includes(fullCommand[0])) {
+      return fullCommand.length === 5 ? true : false;
+    } else {
+      return true;
+    }
   }
 
   parseParams(fullCommand) {
@@ -99,14 +115,11 @@ class Parser {
       const isValidExptime = this.parseExptime(fullCommand[3]);
       const areValidBytes = this.parseBytes(fullCommand[4]);
       if (isValidKey && areValidFlags && isValidExptime && areValidBytes) {
-        if (fullCommand[0] === CAS) {
-          this.setFullCommand(fullCommand[5]);
-        }
-        if (this.checkNoReply(fullCommand)) {
-          this.setFullCommand("noreply");
-        }
+        if (fullCommand[0] === CAS) this.setFullCommand(fullCommand[5]);
+        if (this.checkNoReply(fullCommand)) this.setFullCommand("noreply");
         return true;
       } else {
+        this.commandToRun = [];
         return false;
       }
     } else {
@@ -119,16 +132,18 @@ class Parser {
 
   parseKey(key) {
     const validKey = key.match(REGEX);
-    if (validKey[0] !== "") {
+    if (validKey === null) {
+      return false;
+    } else if (validKey[0] === "") {
+      return false;
+    } else {
       this.setFullCommand(validKey[0]);
       return true;
-    } else {
-      return false;
     }
   }
 
   parseFlags(flags) {
-    const validFlags = parseInt(flags);
+    const validFlags = Number(flags);
     if (Number.isInteger(validFlags)) {
       if (validFlags >= 0 && validFlags <= A_16BIT_UNSIGNED_MAX_VALUE) {
         this.setFullCommand(validFlags);
@@ -142,7 +157,7 @@ class Parser {
   }
 
   parseExptime(exptime) {
-    const validExptime = parseInt(exptime);
+    const validExptime = Number(exptime);
     if (Number.isInteger(validExptime)) {
       if (validExptime < SECONDS_MAX_VALUE) {
         this.setFullCommand(validExptime);
@@ -156,7 +171,7 @@ class Parser {
   }
 
   parseBytes(bytes) {
-    const validBytes = parseInt(bytes);
+    const validBytes = Number(bytes);
     if (Number.isInteger(validBytes)) {
       if (validBytes >= 0) {
         this.setFullCommand(validBytes);

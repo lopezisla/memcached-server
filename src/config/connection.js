@@ -1,6 +1,6 @@
-const { LINE_FEED } = require("../config/constants.js");
 const Parser = require("../classes/Parser");
 const parser = new Parser();
+const { LINE_FEED } = require("../config/constants.js");
 const PORT = process.env.PORT || 11211;
 
 const socketConnection = (socket) => {
