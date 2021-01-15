@@ -15,7 +15,7 @@ class Memcached {
 
   createData(key, flags, exptime, bytes, value) {
     if (exptime > 0) exptime = this.setTimer(key, exptime);
-    const data = [key, flags, this.setCas(), bytes, exptime, value];
+    const data = [key, flags, bytes, this.setCas(), exptime, value];
     this.cache[key] = data;
     return STORED;
   }
@@ -25,15 +25,14 @@ class Memcached {
     const dataArray = Array.from(this.cache[key]);
     const valueDataArray = dataArray.pop();
     dataArray.pop();
-    dataArray.pop();
     if (!cas) dataArray.pop();
     const message = dataArray.join(" ");
     return `VALUE ${message}${LINE_FEED}${valueDataArray}`;
   }
 
   updateData(commandName, key, bytes, value) {
-    this.cache[key][2] = this.setCas();
-    this.cache[key][3] = Number(this.cache[key][3]) + Number(bytes);
+    this.cache[key][3] = this.setCas();
+    this.cache[key][2] = Number(this.cache[key][2]) + Number(bytes);
     if (commandName === APPEND) {
       this.cache[key][5] = `${this.cache[key][5]}${value}`;
     } else {
@@ -53,7 +52,7 @@ class Memcached {
   }
 
   getCas(key) {
-    return this.cache[key][2];
+    return this.cache[key][3];
   }
 
   keyExists(key) {
