@@ -69,6 +69,7 @@ class Memcached {
   getTimer(key){
     return this.cache[key][4];
   }
+
 }
 
 module.exports = Memcached;
