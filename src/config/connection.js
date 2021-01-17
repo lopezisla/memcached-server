@@ -15,7 +15,10 @@ const socketConnection = (socket) => {
   });
   socket.on("end", () =>
     console.log(`${socket.remoteAddress}:${socket.remotePort} disconnected`)
-  ); 
+  );
+  socket.on("error", function (error) {
+    //console.log(error);
+  });
 };
 
 module.exports = { PORT, socketConnection };
