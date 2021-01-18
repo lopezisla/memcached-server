@@ -11,14 +11,14 @@ To install and run this project just type and execute:
 
 The server will be ready to listen for connections on port 11211. You can change it if you want.
 
-This implementation accepts connections and commands from any Memcached client. You can also connect to the server using the telnet command from any CLI:
+This implementation accepts connections and commands from any memcached client. You can also connect to the server using the telnet command from any CLI:
 
     $ telnet <ip-address> <port>
 
 There is no need to send any command to end the session. A client may just close the connection at any moment it no longer needs it.
 
-## Commands supported
-A subset of Memcached commands, with all of their allowed options, are supported. Command names are
+## Supported commands 
+A subset of memcached commands, with all of their allowed options, are supported. Command names are
 lower-case and are case-sensitive.
 
 Storage commands ask the server to store some data identified by a key. The client sends a command line, and then a data block; after that the client expects one line of response, which will indicate
@@ -92,21 +92,31 @@ After sending the command line and the data block the client awaits the reply, w
 
 #### Storage commands samples
 set command with an a key, flag 1, 0 seconds of exptime, 6 bytes and foobar data block value:
+
     set a 1 0 6\r\n
     foobar\r\n
+
 add command with a b key, flag 1, 20 seconds of exptime, 3 bytes and foo data block value:
+
     add b 1 20 3\r\n
     foo\r\n
+
 replace command with an a key, flag 1, 0 seconds of exptime, 3 bytes and bar data block value:
+
     replace a 1 0 3\r\n
     bar\r\n
+
 append command with an a key, flag 1, 0 seconds of exptime, 3 bytes and baz data block value:
+
     append a 1 0 3\r\n
     baz\r\n
 prepend command with an a key, flag 1, 0 seconds of exptime, 3 bytes and qux data block value:
+
     prepend a 1 0 3\r\n
     qux\r\n
+
 cas command with an a key, flag 1, 0 seconds of exptime, 4 bytes, 4 cas unique and baz data block value:
+
     cas a 1 0 4 4 noreply\r\n
     quux\r\n
 
@@ -142,12 +152,19 @@ If some of the keys appearing in a retrieval request are not sent back by the se
 
 #### Retrieval commands samples
 get command with an a key:
+
     get a\r\n
+
 get command with an a and b keys:
+
     get a b c\r\n
+
 gets command with an a key:
+
     gets a\r\n
+
 gets command with an a and b keys:
+
     gets a b\r\n
     
 ## Unit tests
