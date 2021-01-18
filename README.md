@@ -1,11 +1,11 @@
-# MEMCACHED-SERVER
+# memcached-server
 This is a javascript memcached server for a node.js enviroment. 
 
 ## Content
 Supports two types of commands from the original implementation [http://memcached.org/](http://memcached.org/), storage and retrieval commands. You can also find a series of unit tests for each command.
 
 ## Installation
-To install and run this proyect just type and execute:
+To install and run this project just type and execute:
 
     $ npm start
 
@@ -15,8 +15,11 @@ This implementation accepts connections and commands from any Memcached client. 
 
     $ telnet <ip-address> <port>
 
+There is no need to send any command to end the session. A client may just close the connection at any moment it no longer needs it.
+
 ## Commands supported
-A subset of Memcached commands, with all of their allowed options, are supported. 
+A subset of Memcached commands, with all of their allowed options, are supported. Command names are
+lower-case and are case-sensitive.
 
 Storage commands ask the server to store some data identified by a key. The client sends a command line, and then a data block; after that the client expects one line of response, which will indicate
 success or failure.
@@ -87,4 +90,65 @@ After sending the command line and the data block the client awaits the reply, w
 
 - `NOT_FOUND\r\n` to indicate that the item you are trying to store with a "cas" command did not exist.
 
+### Storage commands samples
+
+    set a 1 0 6\r\n
+    foobar\r\n
+
+    add b 1 20 3\r\n
+    foo\r\n
+
+    replace a 1 0 3\r\n
+    bar\r\n
+
+    append a 1 0 3\r\n
+    baz\r\n
+
+    prepend a 1 0 3\r\n
+    qux\r\n
+
+    cas a 1 0 4 4 noreply\r\n
+    quux\r\n
+
+
 ### Retrieval commands
+The retrieval commands "get" and "gets" operate like this:
+
+    get <key>*\r\n
+    gets <key>*\r\n
+
+- `<key>*` means one or more key strings separated by whitespace.
+
+After this command, the client expects zero or more items, each of which is received as a text line followed by a data block. After all the items have been transmitted, the server sends the string.
+
+- `END\r\n` to indicate the end of response.
+
+Each item sent by the server looks like this:
+
+    VALUE <key> <flags> <bytes> [<cas unique>]\r\n
+    <data block>\r\n
+
+- `<key>` is the key for the item being sent.
+
+- `<flags>` is the flags value set by the storage command.
+
+- `<bytes>` is the length of the data block to follow, *not* including its delimiting \r\n .
+
+- `<cas unique>` is a unique 64-bit integer that uniquely identifies this specific item.
+
+- `<data block>` is the data for this item.
+
+If some of the keys appearing in a retrieval request are not sent back by the server in the item list this means that the server does not hold items with such keys.
+
+### Retrieval commands samples
+
+    get a\r\n
+
+    get a b c\r\n
+
+    gets a\r\n
+
+    gets a b\r\n
+    
+
+
