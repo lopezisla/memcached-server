@@ -155,7 +155,7 @@ get command with an a key:
 
     get a\r\n
 
-get command with an a and b keys:
+get command with an a, b and c keys:
 
     get a b c\r\n
 
