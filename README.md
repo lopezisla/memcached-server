@@ -90,31 +90,31 @@ After sending the command line and the data block the client awaits the reply, w
 
 - `NOT_FOUND\r\n` to indicate that the item you are trying to store with a "cas" command did not exist.
 
-### Storage commands samples
-
+#### Storage commands samples
+set command with an a key, flag 1, 0 seconds of exptime, 6 bytes and foobar data block value:
     set a 1 0 6\r\n
     foobar\r\n
-
+add command with a b key, flag 1, 20 seconds of exptime, 3 bytes and foo data block value:
     add b 1 20 3\r\n
     foo\r\n
-
+replace command with an a key, flag 1, 0 seconds of exptime, 3 bytes and bar data block value:
     replace a 1 0 3\r\n
     bar\r\n
-
+append command with an a key, flag 1, 0 seconds of exptime, 3 bytes and baz data block value:
     append a 1 0 3\r\n
     baz\r\n
-
+prepend command with an a key, flag 1, 0 seconds of exptime, 3 bytes and qux data block value:
     prepend a 1 0 3\r\n
     qux\r\n
-
+cas command with an a key, flag 1, 0 seconds of exptime, 4 bytes, 4 cas unique and baz data block value:
     cas a 1 0 4 4 noreply\r\n
     quux\r\n
-
 
 ### Retrieval commands
 The retrieval commands "get" and "gets" operate like this:
 
     get <key>*\r\n
+
     gets <key>*\r\n
 
 - `<key>*` means one or more key strings separated by whitespace.
@@ -140,15 +140,23 @@ Each item sent by the server looks like this:
 
 If some of the keys appearing in a retrieval request are not sent back by the server in the item list this means that the server does not hold items with such keys.
 
-### Retrieval commands samples
-
+#### Retrieval commands samples
+get command with an a key:
     get a\r\n
-
+get command with an a and b keys:
     get a b c\r\n
-
+gets command with an a key:
     gets a\r\n
-
+gets command with an a and b keys:
     gets a b\r\n
     
+## Unit tests
+Use the following command to run the unit tests:
+
+    $ npm run test
+
+## References
+- Memcached original implementation: [http://memcached.org/](http://memcached.org/)
+- Protocol: [protocol.txt](https://github.com/memcached/memcached/blob/master/doc/protocol.txt)
 
 
